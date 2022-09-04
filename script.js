@@ -1,37 +1,81 @@
 var SHAMISEN_NOTES = [
-    "D2", "F2", "G2", "A2", "C3", "D3", "F3", "G3", "A3", "C4",
-    "G2", "A2", "C3", "D3", "F3", "G3", "A3", "C4", "D4", "F4",
-    "D3", "F3", "G3", "A3", "C4", "D4", "F4", "G4", "A4", "C5",
+    [
+        'D2', 'F2', 'G2', 'A2', 'C3', 'D3', 'F3', 'G3', 'A3', 'C4',
+        'G2', 'A2', 'C3', 'D3', 'F3', 'G3', 'A3', 'C4', 'D4', 'F4',
+        'D3', 'F3', 'G3', 'A3', 'C4', 'D4', 'F4', 'G4', 'A4', 'C5',
+    ],
+    [
+        'D2', 'F2', 'G2', 'A2', 'C3', 'D3', 'F3', 'G3', 'A3', 'C4',
+        'A2', 'C3', 'D3', 'F3', 'G3', 'A3', 'C4', 'D4', 'F4', 'G4',
+        'D3', 'F3', 'G3', 'A3', 'C4', 'D4', 'F4', 'G4', 'A4', 'C5',
+    ],
+    [
+        'D2', 'F2', 'G2', 'A2', 'C3', 'D3', 'F3', 'G3', 'A3', 'C4',
+        'G2', 'A2', 'C3', 'D3', 'F3', 'G3', 'A3', 'C4', 'D4', 'F4',
+        'C3', 'D3', 'F3', 'G3', 'A3', 'C4', 'D4', 'F4', 'G4', 'A4',
+    ],
 ]
 
 var SHAMISEN_KEYS = [
-    "z", "x", "c", "v", "b", "n", "m", ",", ".", "/",
-    "a", "s", "d", "f", "g", "h", "j", "k", "l", ";",
-    "q", "w", "e", "r", "t", "y", "u", "i", "o", "p",
+    'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',
+    'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';',
+    'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
 ]
 
-const plucky = new Tone.PolySynth(Tone.PluckSynth, { resonance: 0.91, octaves: 1.5, dampening: 1000 }).toDestination();
+const plucky = new Tone.Sampler({
+    urls: {
+        'C3': './samp.wav',
+    },
+}).toDestination();
 
+const HON_SHOSHI = 0;
+const NI_AGARI = 1;
+const SAN_SAGARI = 2;
+var tuning = 0;
+
+var lastNotes = [
+    '',
+    '',
+    '',
+];
+
+const TuningNames = [
+    '本調子 (Hon Choshi)',
+    '二上がり (Ni Agari)',
+    '三下がり (San Sagari)',
+]
 
 window.onload = function() {
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
 }
 
 function handleKeyDown(event) {
     let key = event.key;
+    if (event.key == 'ArrowUp') {
+        tuning = (tuning + 1) % 3;
+        document.getElementById('tuning').innerHTML = 'Currently ' + TuningNames[tuning];
+    } else if (event.key == 'ArrowDown') {
+        tuning = (tuning + 2) % 3;
+        document.getElementById('tuning').innerHTML = 'Currently ' + TuningNames[tuning];
+    }
     let index = SHAMISEN_KEYS.indexOf(key);
     if (index >= 0) {
-        plucky.triggerAttackRelease(SHAMISEN_NOTES[index], "32n");
+        let string = Math.floor(index / 10);
+        if (lastNotes[string] != '') {
+            plucky.triggerRelease(lastNotes[string], "+0");
+        }
+        lastNotes[string] = SHAMISEN_NOTES[tuning][index];
+        plucky.triggerAttack(SHAMISEN_NOTES[tuning][index]);
     }
 }
 
 function handleKeyUp(event) {}
 
 function perlin_noise(canvas) {
-    let canvas_ctx = canvas.getContext("2d");
-    let offscreen = document.createElement("canvas");
-    let offscreen_ctx = offscreen.getContext("2d");
+    let canvas_ctx = canvas.getContext('2d');
+    let offscreen = document.createElement('canvas');
+    let offscreen_ctx = offscreen.getContext('2d');
     let saved_alpha = canvas_ctx.globalAlpha;
 
     /* Fill the offscreen buffer with random noise. */
