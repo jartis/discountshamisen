@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Discount Shamisen</title>
+</head>
+
+<body style="margin: 0px !important;overflow:hidden;">
+    <div id="canvas-wrap" style="width: 100vw; height: 100vh; margin: 0px !important;overflow:hidden;">
+        <h1 style="color: white; text-align: center; z-index: 3;">Use the keys Q-P, A-L, and Z-/ to play.</h1>
+        <div id="overlay" style="z-index: 2; width: 100vw; height: 100vh;">
+        </div>
+        <img src="shamisen.png">
+        <canvas id="canvas" style="z-index: -1;" width="1920" height="1080"></canvas>
+    </div>
+
+    <!-- tone.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <script src="script.js "></script>
+    <!--
+        <script src="https://unpkg.com/micromodal/dist/micromodal.min.js "></script>
+    -->
+</body>
+
+</html>
