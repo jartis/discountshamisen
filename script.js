@@ -14,13 +14,13 @@ var SHAMISEN_NOTES = [
         'G2', 'A2', 'C3', 'D3', 'F3', 'G3', 'A3', 'C4', 'D4', 'F4',
         'C3', 'D3', 'F3', 'G3', 'A3', 'C4', 'D4', 'F4', 'G4', 'A4',
     ],
-]
+];
 
 var SHAMISEN_KEYS = [
-    'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',
-    'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';',
-    'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
-]
+    'KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Period', 'Slash',
+    'KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon',
+    'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP',
+];
 
 const plucky = new Tone.Sampler({
     urls: {
@@ -51,6 +51,7 @@ window.onload = function() {
 }
 
 function handleKeyDown(event) {
+    event.preventDefault();
     let key = event.key;
     if (event.key == 'ArrowUp') {
         tuning = (tuning + 1) % 3;
@@ -59,14 +60,21 @@ function handleKeyDown(event) {
         tuning = (tuning + 2) % 3;
         document.getElementById('tuning').innerHTML = 'Currently ' + TuningNames[tuning];
     }
-    let index = SHAMISEN_KEYS.indexOf(key);
+    let index = SHAMISEN_KEYS.indexOf(event.code);
     if (index >= 0) {
         let string = Math.floor(index / 10);
         if (lastNotes[string] != '') {
             plucky.triggerRelease(lastNotes[string], "+0");
         }
-        lastNotes[string] = SHAMISEN_NOTES[tuning][index];
-        plucky.triggerAttack(SHAMISEN_NOTES[tuning][index]);
+        let note = SHAMISEN_NOTES[tuning][index];
+        if (event.ctrlKey) {
+            note = Tone.Frequency(note).transpose(2);
+        } else if (event.shiftKey) {
+            note = Tone.Frequency(note).transpose(1);
+        }
+        lastNotes[string] = note;
+
+        plucky.triggerAttack(note);
     }
 }
 
